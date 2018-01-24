@@ -1,5 +1,5 @@
 ---
-title: "hw1.Rmd"
+title: "STAT 4580 hw1"
 output: html_document
 ---
 
@@ -7,22 +7,34 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Brief Description
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This is a data set that record waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Parkt, Wyoming, USA.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
+There are two variables in this data set, **eruption**, the Eruption time (in mins) and **waiting**, the waiting time to next eruption (in mins). Below is the first six obeservations in this dataset.
 ```{r cars}
-summary(cars)
+head(faithful)
+```
+We also have the summary of both variable.
+```{r cars}
+summary(faithful)
+```
+From the summary above we can see that the eruption time is between 1.6 to 5.1 minutes with median of 4 minutes and mean of 3.488 minutes, and the waiting time is between 43 minutes to 96 minutes, with median of 76 and mean of 70.9 minutes.
+
+##Plots
+We conduct a plot of the faithful dataset, and we can observe that there is a linear association between eruptions and waiting. However, the observations are not spread out evenly, instead they are mainly seperated into two clusters.
+
+```{r pressure, echo = FALSE}
+plot(faithful,xlab = "eruptions (in mins)",
+     ylab = "waiting (in mins)",
+     main = "faithful")
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+To take a closer look at this data set, we draw a histogram for each of the two variables. 
+```{r pressure, echo = FALSE}
+hist(faithful$eruptions)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r pressure, echo = FALSE}
+hist(faithful$waiting)
+```
+As we observed in the histograms, both of the two variables have bimodal distribution.
