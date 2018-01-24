@@ -38,4 +38,4 @@ hist(faithful$eruptions)
 hist(faithful$waiting)
 ```
 
-As we observed in the histograms, both of the two variables have bimodal distribution.
+As we observed in the histograms, both of the two variables have bimodal distribution. Further investigation might be needed to make conclusion about the association.
