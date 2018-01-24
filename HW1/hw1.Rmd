@@ -21,7 +21,7 @@ summary(faithful)
 ```
 From the summary above we can see that the eruption time is between 1.6 to 5.1 minutes with median of 4 minutes and mean of 3.488 minutes, and the waiting time is between 43 minutes to 96 minutes, with median of 76 and mean of 70.9 minutes.
 
-##Plots
+## Plots
 We conduct a plot of the faithful dataset, and we can observe that there is a linear association between eruptions and waiting. However, the observations are not spread out evenly, instead they are mainly seperated into two clusters.
 
 ```{r pressure, echo = FALSE}
