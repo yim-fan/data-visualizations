@@ -8,7 +8,8 @@
 #
 # FILES IN HW1
 # hw1.Rmd   -- the r markdown file introducing faithful dataset
-# hw1.html  -- the html fiel created from hw1.Rmd
+# hw1.html  -- the html file created from hw1.Rmd
 #
 # FILES IN HW2
-# hw2.Rmd   -- a r markdown file
+# hw2.Rmd   -- a r markdown file about appropriate visualization comparison
+# hw2.html  -- the html file created from hw2.Rmd
