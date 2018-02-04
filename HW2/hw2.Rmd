@@ -1,0 +1,73 @@
+---
+title: "STAT 4580 hw 2"
+author: "Yimeng Fan"
+date: "Febuary 2, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 1: Better Visualization
+
+  The welfare visualization on USA TODAY website is very misleading. The graph has the zero baseline issue: because it has a meaningless nonzero baseline. The ratio of the bin length make it looks like that people recieving welfare has been almost quadrupled from 2009 quarter 1 to 2011 quarter 2, but the welfare is actually only raised by about 10 percent.
+
+  Below is a better way to visualize the dataset.
+
+```{r welfare, include=FALSE}
+if (! file.exists("hw2-welfare.csv"))
+    download.file("homepage.divms.uiowa.edu/~luke/classes/STAT4580/hw2-welfare.csv",
+                  "hw2-welfare.csv")
+welfare <- read.csv("hw2-welfare.csv")
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "lattice")) {
+  install.packages(pkgs = "lattice")
+}
+library(lattice)
+```
+```{r welfare_graph}
+ggplot(welfare) +
+  geom_bar(aes(y = onAssistance, x = quarter), stat = "identity", width = 0.6) + 
+  labs( y = "Number of Americans", title = "Number of Americans Recieving Welfare 2009-2011") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+  This is a more appropriate visualization because in this graph, 0 is used as the basline value. Therefore, the length of the bars show the ratio of people recieving welfare more accurately.
+
+## Part 2: Average Life Expectancies
+
+Below is two graph  over the same life expectancy dataset.
+
+```{r gapminder, include=FALSE}
+if (!require(package = "gapminder")) {
+  install.packages(pkgs = "gapminder")
+}
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+library(gapminder)
+library(dplyr)
+```
+
+```{r gapminder_graph}
+subset <- subset(gapminder, gapminder$year>1990)
+subset_by_continent <- group_by(subset, continent)
+subset_continent_mean <- summarize(subset_by_continent, avg_lifeExp=mean(lifeExp))
+
+ggplot(subset_continent_mean) +
+  geom_point(aes(y = avg_lifeExp, x = continent)) +
+  labs (title = "Average Life Expectancy across Continents after 1990", 
+        subtitle = "dotplot", y = "Average Life Expectancy")
+ggplot(subset_continent_mean) +
+  geom_bar(aes(y = avg_lifeExp, x = continent), stat = "identity", width = 0.5, ) +
+  labs (title = "Average Life Expectancy across Continents after 1990", 
+        subtitle = "barchart", y = "Average Life Expectancy")
+```
+
+  Although the two graph is very similar, the barchart graph is a more appropriate visualization. In dotplot, the difference in life Expenctency between Africa and Oceania seems super extreme than it actually is. Our focus of this graph should be the ratio not the difference, and barchart emphasizes ratio more, so barchart is a better choice.
+
+  However, if Africa and Oceania are removed from this data set, the remaining three continents have similar life Expectency. The ratio is veriy close to 1:1:1, which is almost meanningless. So we should now focus on the differences more. Since dotplot emphasizes on difference more, it becomes a better visualization.
