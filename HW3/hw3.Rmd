@@ -1,0 +1,71 @@
+---
+title: "hw3.Rmd"
+author: "Yimeng Fan"
+date: "February 12, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "gapminder")) {
+  install.packages(pkgs = "gapminder")
+}
+library(gapminder)
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+library(dplyr)
+subset <- subset(gapminder, gapminder$year>1990)
+```
+
+## Life Expectancy Distribution by Continent
+
+Below is a set of density plots showing the life expectancy distributions within continents from a subset of data in the gapminder package for the years since 1990.
+
+```{r density plots}
+head(subset)
+ggplot(subset) + geom_density(aes(x = lifeExp)) + facet_wrap(~continent)+labs(title = "density plots for life expectancy over continents", x = "life Expectancy")
+```
+
+## Boxplots of Life Expectancy by Continent
+
+Below is a set of boxplots on the same data set
+
+```{r boxplot, echo=FALSE}
+ggplot(subset) +
+    geom_boxplot(aes(x = continent, y = lifeExp))
+```
+
+## Boxplots of Life Expectancy by Continent
+
+Below is a set of qq plots on the same data set
+
+```{r qq plot, echo=FALSE}
+ggplot(subset) + geom_qq(aes(sample = lifeExp)) + facet_wrap(~continent) +   scale_x_continuous() +
+  scale_y_continuous()
+```
+
+A normal distribution might adequately describe the life expectancy in Europe and Oceania, since their qq plot is very close to linear and probably America since it is still faily similar to linear relationship. But not quite accurate to describ Asia and Africa.
+
+## Find a Better Visualization
+
+The visualization posted by ABC News in early 2017 do not accurately represent the numbers because in this graph the length of the bins is not proportional to days taking office. Below is the first five observations of the data. 
+
+```{r visualization data, echo=FALSE}
+president = c("Obama","Carter","Clinton","G.W.Bush","Reagan","G.H.W.Bush","Trump")
+day = c(79,78,68,65,58,56,40)
+party = c("D","D","D","R","R","R","R")
+TrackingOffice = data.frame(president,day,party)
+head(TrackingOffice)
+```
+
+Here is a better visualizaiton of the same data set:
+
+```{r better visualization, echo = FALSE}
+office_ord <- mutate(TrackingOffice, president = reorder(president, -day, sum))
+ggplot(office_ord) + geom_bar(aes(x = president, y = day, fill = party), stat = "identity", width = 0.5) + labs(title = "favorability on taking office", y = "precentage")
+```
