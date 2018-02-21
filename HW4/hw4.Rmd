@@ -1,0 +1,77 @@
+---
+title: "hw4.Rmd"
+author: "Yimeng Fan"
+date: "February 21, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "gapminder")) {
+  install.packages(pkgs = "gapminder")
+}
+library(gapminder)
+library(readr)
+if (! file.exists("vehicles.csv.zip"))
+    download.file("http://www.stat.uiowa.edu/~luke/data/vehicles.csv.zip",
+                  "vehicles.csv.zip")
+newmpg <- read_csv("vehicles.csv.zip", guess_max = 10000)
+A <- subset(gapminder,gapminder$year == 1977)
+B <- subset(gapminder,gapminder$year == 1987)
+C <- subset(gapminder,gapminder$year == 1997)
+D <- subset(gapminder,gapminder$year == 2007)
+gapminderSub <- rbind(A,B,C,D)
+```
+
+## Life Expectancy and GDP Per Capita
+
+The data set gapminder records the life Expectancy and GDP per capita across continents in different years. Below is a set of scatter plots of life expectancy against GDP per capita for year 1977,1987,1997 and 2007 conducted from gapminder dataset.
+
+```{r gapminder plot}
+ggplot(gapminderSub, aes(lifeExp, gdpPercap,color = factor(continent),size = pop)) + facet_wrap(~year) + geom_point() + scale_size_area()
+
+```
+
+## Fuel Economy
+
+mpg data set provides data on fuel economy and various other characteristics of vehicles tested by the EPA. Below is a city fuel economy vs engine displacement scatter plot conducted from mpg data set.
+
+```{r fuel Economy scatterplot}
+ggplot(mpg,aes(cty,displ)) + geom_point()
+```
+
+To embed more information, we use color to represent the number of cylinders in each vehicle's engine
+
+```{r fuel Economy cylinders}
+ggplot(mpg,aes(cty,displ,color = factor(cyl))) + geom_point()
+```
+
+We can also use shape to represent manual or automatic transmission,as shown below.
+
+```{r fuel Economy trans}
+ggplot(mpg,aes(cty,displ,color = factor(cyl),shape=substring(trans,1,4))) + geom_point()
+```
+
+We can also use barchart to see how the split between manual and automatic transmission varies between vehicles with different numbers of cylinders 
+
+```{r fuel Economy barchart}
+ggplot(mpg,aes(as.factor(cyl),fill=substring(trans,1,4)))+ geom_bar(position="fill")
+```
+
+##Fuel Economy Again
+
+The mpg data set is rather old: the newest model is from 2008. Below is a newer data set, which include models from the year 1984-2018. We can conduct similar graph from this newer data set from year 2009. Note: 139 observations are not on the graph due to missing values.
+
+```{r fuel Economy Again}
+newmpg_sub = subset(newmpg,newmpg$year>=2009)
+ggplot(newmpg_sub,aes(city08,displ)) + geom_point(size = 0.5)
+ggplot(newmpg_sub,aes(city08,displ,color = factor(cylinders))) + geom_point(size = 0.5)
+ggplot(newmpg_sub,aes(city08,displ,color=substring(trany,1,4))) + geom_point(size = 0.5)
+ggplot(newmpg_sub,aes(as.factor(cylinders),fill=substring(trany,1,4)))+ geom_bar(position="fill")
+```
+
+Comparing these two data set, we can notice that the city fuel economy level is generally increasing. In the newer data set we also have an observation that has over 120 city fuel economy, which is extremely high comparing to other observations from this data set. We can also discover that some newer models start to have more cylinders than before.
