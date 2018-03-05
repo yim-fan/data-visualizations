@@ -1,0 +1,85 @@
+---
+title: "hw5.Rmd"
+author: "Yimeng Fan"
+date: "March 5, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "nycflights13")) {
+  install.packages(pkgs = "nycflights13")
+}
+library(nycflights13)
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+library(dplyr)
+library(readr)
+if (! file.exists("vehicles.csv.zip"))
+    download.file("http://www.stat.uiowa.edu/~luke/data/vehicles.csv.zip",
+                  "vehicles.csv.zip")
+mpg <- read_csv("vehicles.csv.zip", guess_max = 10000)
+```
+
+## Evaluate a Visualization
+
+In the one on our homework, the size of the circles is  proportional to the data, while the one in Vox the proportion protrayed is limited. The size of the circles is more about the ranking so every circle can be viewed clearl, but does not correspond to the actual proportion.
+
+The item on this is diseases that could cause death. The attributes are disease name, funding, and death. Marks are the circles. 
+Channels include position on y scale and size
+(radius), which both represents money raised and death caused; horizontal scale, which identifies whether the data is death or money raised; color hue, which represents type of disease. 
+The mapping used is the color of the circles, each color corresponding to a different disease. 
+
+Using color hue as a maching is kind of weak. Because there is too many colors, we cannot tell which data is match to which really quik, and the hue down the graph is fairly hard to percieve. One thing we can do, is using the lighter color to represents money raised, a darker color to represents death, and have them overlaped togehter, so we only preserves on ranking, probably money raised because it seems to matter more. So we can clearly see the difference between how much is raised vs how many people are death from the disease.
+
+## Arrival Delays and Cancellation
+
+Below is the average late time graph for flights in three airports across the day
+
+```{r flights, echo=FALSE}
+flight1 <- select(flights,origin, hour, arr_time, arr_delay)
+flightdelay <- summarize(group_by(flight1,origin,hour), ave_arr_delay = mean(arr_delay, na.rm=TRUE))
+ggplot(flightdelay, aes(hour,ave_arr_delay,color = factor(origin))) + geom_point() + geom_hline(yintercept = 0) + geom_line() + xlab('airport') + ylab("average delay") + coord_cartesian(xlim = c(5,23))
+```
+
+Generally flights in the morning which departure hour is under 10 will mostly arrive either early or on time, so this is the most favoble time to depart.
+
+```{r flightsProportion, echo=FALSE}
+flights2 <- mutate(flights, cancel =
+ifelse(is.na(dep_time)&is.na(arr_time),1,0))
+flights2 <- mutate(flights2, count = 1)
+cancelflights<-aggregate(flights2[,20:21],list(flights2$hour, flights2$origin),sum)
+cancelflights <- mutate(cancelflights, percent = cancel/count)
+ggplot(cancelflights, aes(Group.1,percent,color=factor(Group.2),size = count)) + geom_point() + scale_size(range = c(0.5,3)) + geom_smooth(method = "lm", fill = NA, size = 0.3)
+cancelflights2 <- filter(cancelflights, percent != 1)
+ggplot(cancelflights2,
+aes(Group.1,percent,color=factor(Group.2),size = count)) + geom_point() + scale_size(range = c(0.5,3)) + geom_smooth(method = "lm", fill = NA, size = 0.3)
+```
+
+In the 2 graphs above, we have the percentage of cancelation vs time graph. On the second graph, we exclude one exception of the only flight at departure time 1 got canceled. As we can see, flights departure ealier tend to be canceled less. The cancelation percentage for JFK airport increase the least with later departure time, and LGA airport increases the most.
+
+## Fleet City Gas Mileage
+
+```{r mileage, echo = FALSE}
+mpg2018<-select(mpg, make,year,cty=city08,trans=trany,cyl = cylinders,fuel=fuelType1,displ)
+mpg2018 <-filter(mpg2018,year==2018,fuel != "Electricity")
+mpg2018 <-summarize(group_by(mpg2018,make),ave_cty = mean(cty,na.rm=TRUE),n=n())
+mpgtop <- mutate(mpg2018, rank = min_rank(ave_cty))
+top_n(mpgtop,5,ave_cty)
+```
+
+as we can see, the top five manufacturers with the highest average city gas mileage for their non-electric vehicles in 2018 are: Honda, Hyundai, Mazda, Mitsubishi, Toyota
+
+```{r mileage 2, echo = FALSE}
+mpg2018<-select(mpg, make,year,cty=city08,trans=trany,cyl = cylinders,fuel=fuelType1,displ)
+mpg2018 <-filter(mpg2018, fuel != "Electricity", make =="Honda"|make=="Hyundai"|make=="Mazda"|make=="Mitsubishi"|make=="Toyota")
+mpg2018 <-summarize(group_by(mpg2018,make,year),ave_cty = mean(cty,na.rm=TRUE))
+ggplot(mpg2018, aes(year,ave_cty,color=factor(make))) + geom_point()
+```
+
+Above is a graph of the average city mileage of the top five average city gas mileage non_electric vehicles in 2018. As we can see, most of the have a parabola like curve. The average mileage decreases to about 2000, and increases back to a even higher mileage now in 2018.
