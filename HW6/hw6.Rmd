@@ -1,0 +1,113 @@
+---
+title: "hw6.Rmd"
+author: "Yimeng Fan"
+date: "March 20, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "nycflights13")) {
+  install.packages(pkgs = "nycflights13")
+}
+library(nycflights13)
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+library(dplyr)
+if (!require(package = "lattice")) {
+  install.packages(pkgs = "lattice")
+}
+library(dplyr)
+library(nycflights13)
+```
+
+## 1. Departure Delays and Wind Speed
+
+In the weather dataset, when we take a closer look at wind speed, the maximum value we get is 1048.361 mph, which does not make sense at all. So we are going to set it to NA.
+
+```{r newweather}
+summary(weather$wind_speed)
+newweather <- mutate(weather, wind_speed =
+ifelse(wind_speed>1000,NA,wind_speed))
+summary(newweather$wind_speed)
+```
+
+After cleaning up, we can now merge the weather dataset and the flights dataset sets together. As we can see, "origin" and "time_hour" are proper primary keys for the weather table. They uniquely identified rows, and do not contain missing values.
+
+```{r show primary key}
+filter(count(newweather,origin, time_hour),n>1)
+```
+
+So we can join weather and flights dataset together using them as primary keys, and drop unuseful fields. This is what the clean dataset looks like after merging.
+
+```{r merge data}
+fl1 <- left_join(flights, newweather, c("origin", "time_hour"))
+wtfl <- select(fl1, origin, time_hour, dep_delay, wind_speed, tailnum, flight)
+head(wtfl,2)
+```
+
+We can now play with the dataset and generate useful graph from it. Below is a average departure delay vs. wind speed graph.
+
+```{r wtfl plot, message=FALSE, warning=FALSE, paged.print=TRUE}
+wtfl1 <- summarize(group_by(wtfl, wind_speed_level = equal.count(wind_speed)), ave_dep_delay = mean(dep_delay, na.rm = TRUE),n = n())
+ggplot(wtfl1, aes(wind_speed_level,ave_dep_delay)) + geom_point() + geom_smooth()
+```
+
+As we can see from the graph, flight average departure delay is associated with the wind speed level at that time. Generally flights that depart at lower wind speed level tend to be delayed less. 
+
+However, the trend becomes messier at higher wind speed level. The departure delay seems faily random when the wind speed get large because we have less observations of departures at these higher wind speed days. To show this problem, we embed numbers of departures into the graph by the size of the points.
+
+```{r wtfl plot embed departure num, message=FALSE, warning=FALSE, paged.print=FALSE}
+ggplot(wtfl1, aes(wind_speed_level,ave_dep_delay, size = n)) + geom_point(alpha = 0.8) + geom_smooth()
+```
+
+This graph shows us that the number of departures decreases greately after wind speed of 25mph. This decrease is either caused by large amount of canceled flights or rarely severe weather. But overall days with higher wind speed are not good days to take flights.
+
+## 2. Cancellations and Destination Location
+
+We can now make a map graph from the flights data. As always we start by cleaning up the data. Only leaving information we want. We find the top 50 popular destinations airport in the first 3 month of 2013, and gather information such as percentage of cancelation, average arrival delay for each of the airport.
+
+```{r flights cleanup data, message=FALSE, warning=FALSE}
+fl2 <- filter(flights, year == 2013, month <=3 )
+fl2 <- mutate(fl2, canceled = is.na(dep_time) & is.na(arr_time))
+fl2 <- summarize(group_by(fl2,dest), 
+    ave_arr_delay = mean(arr_delay, na.rm=TRUE),
+    canceled_flight = sum(canceled), n = n())
+fl2 <- mutate(fl2, canceled_proportion = canceled_flight/ n)
+fl2 <- select(fl2, dest, ave_arr_delay, n, canceled_proportion)
+flights1 <- mutate(fl2, rank = min_rank(n))
+```
+
+Now we can make a map with a point at each of the top 50 destination and encode the proportion of canceled flights in the point's size.
+
+```{r map graph, message=FALSE, warning=FALSE}
+flights1 <- top_n(flights1,50,n)
+ap <- left_join(flights1, airports, c("dest"="faa"))
+ggplot(ap, aes(x = lon, y = lat, size = canceled_proportion)) + 
+    borders("state") + geom_point(alpha = 0.7) + coord_map() +scale_size(1)
+```
+
+From the graph, we can observe that among all the airports in US, flights that has a destination airport in the center east erea are more likely to get canceled, where in the west and deep south the flights are less likely to get canceld. Also in the north US we have more airports with large incoming passenger traffic.
+
+We embed the level of average arrival delay into the graph using color, with less than 20 minutes being acceptable and more than 20 minutes being too long.
+
+```{r embed delay color, message=FALSE, warning=FALSE, paged.print=TRUE}
+ap<- mutate(ap, delay =
+ifelse(ave_arr_delay>20,"long delay","acceptable delay"))
+ggplot(ap, aes(x = lon, y = lat, size = canceled_proportion, color = factor(delay))) + 
+    borders("state") + geom_point(alpha = 0.65) + coord_map()
+```
+
+We can also use shape to encode the same information.
+
+```{r embed delay shape, message=FALSE, warning=FALSE}
+ggplot(ap, aes(x = lon, y = lat, size = canceled_proportion, shape = factor(delay))) + 
+    borders("state") + geom_point(alpha = 0.65) + coord_map()
+```
+
+In this case color is a better way to embed more information, because with size already encoding something, shape is harder to identify in the graph. Color pops up more. Also having different shapes disturbs the audiance to read the cancelation proportion.
