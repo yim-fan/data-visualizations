@@ -1,0 +1,23 @@
+---
+title: "Project proposal"
+author: "Yimeng Fan"
+date: "March 23, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Steam games sales and popularity investment
+
+  Steam is one of the most popular video game platform across the world. Steam allows gamers and game producers to make transactions, provides forums and ratings for each game. As a gamer, Steam is always the number one game website I would go to when I want to explore new games. 
+  
+  In this project, I'm going to take two dataset from steam: One is the game sale data set that provides games available on steam in 2016, game category, the game producers, game sales in different continent, as well as expert ratings on the game. The other one is about users' status: users' ID, game name, game status(purchased or played) and hours spend on the game. 
+
+  I'm going to use informations from both data set to sovle questions below:
+    
+    1. Which are some of the most popular games on steam in 2016?
+    2. Does games with larger sales generally have longer average user playing hour?
+    3. Is there any correlation between expert rating and game sales (and expert rating and average hour played)?
+    4. What is the prefered game producers and game types of people from different continents have?
