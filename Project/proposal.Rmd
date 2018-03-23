@@ -7,15 +7,31 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "RCurl")) {
+  install.packages(pkgs = "RCurl")
+}
+library(RCurl)
+gameSale <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/master/statProjectDataset/Video_Games_Sales_as_at_22_Dec_2016.csv?token=AAAB0772gyPezUIcNxieE_Kegqq4exSPks5avqiywA%3D%3D"))
+userData <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/master/statProjectDataset/steam-200k.csv?token=AAAB07ZEQ1JDoIkB-spGLHm2jbRRR9Mmks5avqY1wA%3D%3D"))
 ```
 
 ## Steam games sales and popularity investment
 
   Steam is one of the most popular video game platform across the world. Steam allows gamers and game producers to make transactions, provides forums and ratings for each game. As a gamer, Steam is always the number one game website I would go to when I want to explore new games. 
   
-  In this project, I'm going to take two dataset from steam: One is the game sale data set that provides games available on steam in 2016, game category, the game producers, game sales in different continent, as well as expert ratings on the game. The other one is about users' status: users' ID, game name, game status(purchased or played) and hours spend on the game. 
+  In this project, I'm going to take two dataset from steam: One is the game sale data set that provides games available on steam in 2016, game category, the game producers, game sales in different continent, as well as expert ratings on the game. Below is some of the observations in this dataset:
+  
+```{r gameSale data}
+head(gameSale,2)
+```
+  
+  The other one is about users' status: users' ID, game name, game status(purchased or played) and hours spend on the game. Below are the first two observations in this dataset:
+  
+```{r usersData}
+head(userData,2)
+```
 
-  I'm going to use informations from both data set to sovle questions below:
+  I'm would like to use informations from both data set to sovle questions below:
     
     1. Which are some of the most popular games on steam in 2016?
     2. Does games with larger sales generally have longer average user playing hour?

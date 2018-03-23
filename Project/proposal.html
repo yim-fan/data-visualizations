@@ -129,8 +129,20 @@ $(document).ready(function () {
 <div id="steam-games-sales-and-popularity-investment" class="section level2">
 <h2>Steam games sales and popularity investment</h2>
 <p>Steam is one of the most popular video game platform across the world. Steam allows gamers and game producers to make transactions, provides forums and ratings for each game. As a gamer, Steam is always the number one game website I would go to when I want to explore new games.</p>
-<p>In this project, I’m going to take two dataset from steam: One is the game sale data set that provides games available on steam in 2016, game category, the game producers, game sales in different continent, as well as expert ratings on the game. The other one is about users’ status: users’ ID, game name, game status(purchased or played) and hours spend on the game.</p>
-<p>I’m going to use informations from both data set to sovle questions below:</p>
+<p>In this project, I’m going to take two dataset from steam: One is the game sale data set that provides games available on steam in 2016, game category, the game producers, game sales in different continent, as well as expert ratings on the game. Below is some of the observations in this dataset:</p>
+<pre class="r"><code>head(gameSale,2)</code></pre>
+<pre><code>##                        name platform year    genre publisher NA_Sales
+## 1                  Wii Play      Wii 2006     Misc  Nintendo    13.96
+## 2 New Super Mario Bros. Wii      Wii 2009 Platform  Nintendo    14.44
+##   EU_Sales JP_Sales Other_sales Global_sales rating X
+## 1     9.18     2.93        2.84        28.92     58  
+## 2     6.94     4.70        2.24        28.32     87</code></pre>
+<p>The other one is about users’ status: users’ ID, game name, game status(purchased or played) and hours spend on the game. Below are the first two observations in this dataset:</p>
+<pre class="r"><code>head(userData,2)</code></pre>
+<pre><code>##          id  game   status hour.played
+## 1 151603712 Spore purchase         1.0
+## 2 151603712 Spore     play        14.9</code></pre>
+<p>I’m would like to use informations from both data set to sovle questions below:</p>
 <pre><code>1. Which are some of the most popular games on steam in 2016?
 2. Does games with larger sales generally have longer average user playing hour?
 3. Is there any correlation between expert rating and game sales (and expert rating and average hour played)?
