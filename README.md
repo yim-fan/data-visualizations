@@ -8,7 +8,8 @@
 # HW3       -- due FEB.12
 # HW4       -- due FEB.21
 # HW5       -- due MAR.5
-#
+# HW6       -- due MAR.21
+# Project   -- due MAR.23
 #
 # FILES IN HW1
 # hw1.Rmd   -- the r markdown file introducing faithful dataset
@@ -29,3 +30,11 @@
 # FILES IN HW5
 # hw5.Rmd   -- a hw5 r markdown file
 # hw5.html  -- the html file created from hw5.Rmd
+#
+# FILES IN HW6
+# hw5.Rmd   -- a hw6 r markdown file, more about flight cancelation and delay
+# hw5.html  -- the html file created from hw6.Rmd
+#
+# FILES IN Project
+# proposal.Rmd   -- a r mardown file that contains the project proposal
+# proposal.html  -- the html file created from proposal.Rmd
