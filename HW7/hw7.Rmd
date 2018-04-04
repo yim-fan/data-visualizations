@@ -1,0 +1,96 @@
+---
+title: "hw7.Rmd"
+author: "Yimeng Fan"
+date: "April 4, 2018"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "SemiPar")) {
+  install.packages(pkgs = "SemiPar")
+}
+library(SemiPar)
+if (!require(package = "nycflights13")) {
+  install.packages(pkgs = "nycflights13")
+}
+library(nycflights13)
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+library(dplyr)
+if (!require(package = "lattice")) {
+  install.packages(pkgs = "lattice")
+}
+library(dplyr)
+library(nycflights13)
+if (!require(package = "rgl")) {
+  install.packages(pkgs = "rgl")
+}
+library(rgl)
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+data("calif.air.poll")
+```
+
+## 1.Air Pollution Data
+
+The dataset calif.air.poll has 345 sets of observations that records the ozone level and meteorological variables in Upland, California in 1976. To observe the relationship between ozone level pressure gradient, iversion base height and inversion base temperature, we make a scatterplot matrix to see the relationship between each to variables.
+
+```{r airpolution scatterplot matrix}
+pairs(calif.air.poll[1:4], cex = 0.1)
+```
+
+From the graph above, It seems like ozone level and inversion base temperature does have an positive moderate association, and inversion base height and inversion base temp have a negative moderate association. Other associations are fairly weak.
+
+We can investigate on the relationship between ozone level and inversion base temperature as pressure gradient changes. To do so, we can make a coplot.
+
+```{r coplot}
+xyplot(ozone.level ~ inversion.base.temp | equal.count(daggett.pressure.gradient, 12), data = calif.air.poll,
+       cex = 0.2, type = c("p", "smooth"),
+       col.line = "red", col = "gray", lwd = 2)
+```
+
+From the coplot, we can observe that as pressure increase, ozone level increase is more sensitive to temperature increase, then when the pressure gradient is high, the sensitivity drops a little, but it's still very sensitive.
+
+To have a more direct view, we include a interactive 3D picture of the observation points.
+
+```{r poll 3dgraph,webgl = TRUE}
+knitr::knit_hooks$set(webgl = rgl::hook_webgl)
+clear3d()
+points3d(calif.air.poll$daggett.pressure.gradient,scale(calif.air.poll$inversion.base.temp,60,.5),scale(calif.air.poll$ozone.level,20,.5),
+         col = rep("black", nrow(calif.air.poll)))
+```
+
+## 2. Wind Speed, Time of Day, and Departure Delays
+
+Last time we did some 2 variable wise comparison to investigate the association between wind speed, departure delays and some other informations for flights that departed from nyc. This time we will include more information to see the assocations between more variables.
+
+First we use similar codes from last time to compute average delays for each hour and wind_speed combination, along with the number of light at each level combination. Below we have the first 5 lines of the modified data.
+
+```{r flights again}
+newweather <- mutate(weather, wind_speed =
+ifelse(wind_speed>1000,NA,wind_speed))
+fl1 <- left_join(flights, newweather, c("origin", "time_hour","hour"))
+wtfl <- select(fl1, origin, time_hour, hour, dep_delay, wind_speed, tailnum, flight)
+wtfl1 <- summarize(group_by(wtfl,wind_speed,hour), ave_dep_delay = mean(dep_delay, na.rm = TRUE),n = n())
+head(wtfl1)
+```
+
+Now we can do coplot to examine the relationship between average departure delay and hour of departure varies with wind speed.
+
+```{r flights coplot}
+xyplot(ave_dep_delay ~ hour | equal.count(wind_speed,12), data = wtfl1, cex=0.2, type = c("p","smooth"),col.line = "red", col = "gray", lwd = 2)
+```
+
+As we can see from the graph, there is a linear association between hour and average departure delay. The later in the day, the longer the flights are likely getting delayed, and the sensitivity of average departure delay to hour slightly increases as the wind speed increases. 
+
+Below is the graph we got from the last time:
+
+```{r wtfl plot, echo = FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+wtfl2 <- summarize(group_by(wtfl, wind_speed_level = equal.count(wind_speed)), ave_dep_delay = mean(dep_delay, na.rm = TRUE),n = n())
+ggplot(wtfl2, aes(wind_speed_level,ave_dep_delay, size = n)) + geom_point(alpha = 0.8) + geom_smooth()
+```
+
+As we can see, our conclusion this time does correspond to what we got from the last time. Regardless of hour, the average departure delay increases as wind speed level increases.
