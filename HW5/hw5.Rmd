@@ -58,7 +58,7 @@ cancelflights <- mutate(cancelflights, percent = cancel/count)
 ggplot(cancelflights, aes(Group.1,percent,color=factor(Group.2),size = count)) + geom_point() + scale_size(range = c(0.5,3)) + geom_smooth(method = "lm", fill = NA, size = 0.3)
 cancelflights2 <- filter(cancelflights, percent != 1)
 ggplot(cancelflights2,
-aes(Group.1,percent,color=factor(Group.2),size = count)) + geom_point() + scale_size(range = c(0.5,3)) + geom_smooth(method = "lm", fill = NA, size = 0.3)
+aes(Group.1,percent,color=factor(Group.2),size = count)) + geom_point() + scale_size(range = c(0.5,3)) + geom_smooth(se=FALSE)
 ```
 
 In the 2 graphs above, we have the percentage of cancelation vs time graph. On the second graph, we exclude one exception of the only flight at departure time 1 got canceled. As we can see, flights departure ealier tend to be canceled less. The cancelation percentage for JFK airport increase the least with later departure time, and LGA airport increases the most.
@@ -79,7 +79,7 @@ as we can see, the top five manufacturers with the highest average city gas mile
 mpg2018<-select(mpg, make,year,cty=city08,trans=trany,cyl = cylinders,fuel=fuelType1,displ)
 mpg2018 <-filter(mpg2018, fuel != "Electricity", make =="Honda"|make=="Hyundai"|make=="Mazda"|make=="Mitsubishi"|make=="Toyota")
 mpg2018 <-summarize(group_by(mpg2018,make,year),ave_cty = mean(cty,na.rm=TRUE))
-ggplot(mpg2018, aes(year,ave_cty,color=factor(make))) + geom_point()
+ggplot(mpg2018, aes(year,ave_cty,color=factor(make))) + geom_point()+geom_smooth(se=FALSE)
 ```
 
 Above is a graph of the average city mileage of the top five average city gas mileage non_electric vehicles in 2018. As we can see, most of the have a parabola like curve. The average mileage decreases to about 2000, and increases back to a even higher mileage now in 2018.
