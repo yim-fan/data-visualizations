@@ -1,0 +1,72 @@
+---
+title: "hw8.Rmd"
+author: "Yimeng Fan"
+date: "April 16, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "lattice")) {
+  install.packages(pkgs = "lattice")
+}
+library(lattice)
+```
+
+## 1. Wine
+
+In this section we draw a coordinate plots and scatter plot to investigate how well the variables separate classes.
+
+```{r Wine}
+library(GGally)
+data(wine, package = "gclus")
+ggparcoord(wine, columns = 2:14, groupColumn = as.character("Class"))
+ggparcoord(wine, columns = c(2,7:14), groupColumn = as.character("Class"))
+splom(~ wine[2:14], group = paste(Class), data = wine, auto.key = TRUE)
+```
+
+As we can see, there is some seperation of the classes. The colors seperated pretty well in the scatter plot, and we can see some obvious tend for different classesin coordinate plots. We got 2 outliars: an extremly low ash in class 2 and high Magnesium in class 2. 
+
+## 2. Unemployment Rates
+
+```{r unemployement read in data, echo = FALSE}
+lausURL <- "http://www.stat.uiowa.edu/~luke/data/laus/laucntycur14-2017.txt"
+lausUS <- read.table(lausURL,
+                     col.names = c("LAUSAreaCode", "State", "County",
+                                   "Title", "Period",
+                                   "LaborForce", "Employed",
+                                   "Unemployed", "UnempRate"),
+                     quote = '"', sep = "|", skip = 6,
+                     stringsAsFactors = FALSE, strip.white = TRUE,
+                     fill = TRUE)
+footstart <- grep("------", lausUS$LAUSAreaCode)
+lausUS <- lausUS[1:(footstart - 1),]
+```
+In this section we are going to take a look at Unemployment rate in Iowa from Nov. 2016 to Dec. 2017. We first calculate the average unemployment in each of the 99 counties in Iowa during this period.
+We find the county with highest unemployment rate, which is Lee County, and the county with lowest unemployment rate, which is Lyon County.
+
+```{r clean data}
+lausUSIA <- filter(lausUS, State == 19)
+lausUSIAun <- summarize(group_by(lausUSIA,County), avg_UnempRate = mean(as.numeric(UnempRate), na.rm = TRUE))
+lausTop <- mutate(lausUSIAun, rank = min_rank(avg_UnempRate))
+top_n(lausTop,1,avg_UnempRate)
+top_n(lausTop,-1,avg_UnempRate)
+head(filter(lausUSIA, County == 119 | County == 111, State==19),2)
+```
+
+We then make a monthly unemployment rate plot over time for these 2 county, which is listed below.
+
+```{r unemployment time}
+library(lubridate)
+library(zoo)
+lausTime <- filter(lausUSIA, County == 119 | County == 111, State==19)
+laus <- mutate(lausTime, date = as.yearmon(Period, "%b-%y"))
+p <- ggplot(laus, aes(y = UnempRate, x = date,group = County))
+p + geom_line(aes(color = as.character(County))) + geom_point()
+```
