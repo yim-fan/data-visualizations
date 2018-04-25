@@ -1,0 +1,39 @@
+---
+title: "hw9.Rmd"
+author: "Yimeng Fan"
+date: "April 25, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+```
+
+## 1. Economic Data
+
+```{r economics}
+econts <- ts(economics[,-1],start = 1967-07-01)
+library(zoo)
+econtz <- as.zoo(econts)
+autoplot(econtz) + facet_free()
+autoplot(econtz,facet = NULL)
+```
+
+As we can see from the economics data graph, personal consumption expendicutres and total population continuously increases most of the time, while other factors such as personal saving rate, unemployment rate and median duration of unemployment changes trend more often. These features are easier to see in the seperate plots.
+
+## 2.Florida Death Penalty Data
+
+```{r deathpenalty}
+data(deathpenalty, package = "catdata")
+xtabs(Freq ~ ., data = deathpenalty)
+factor(deathpenalty$VictimRace, labels = c("black","white"))
+factor(deathpenalty$DeathPenalty, labels = c("no","yes"))
+factor(deathpenalty$DefendantRace, labels = c("black","white"))
+library(vcd)
+doubledecker(xtabs(Freq ~ DefendantRace + VictimRace + DeathPenalty, data = deathpenalty))
+```
+
+From the data, we can conclude that there is a racism issue in judgement of defendants. When victim is white, the defendant is more likely to have a death penalty. If victim is black and defendent is white, the percentage of death penalty is even higher. 
