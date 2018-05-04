@@ -1,0 +1,76 @@
+---
+title: "project"
+author: "Yimeng Fan"
+date: "May 4, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require(package = "RCurl")) {
+  install.packages(pkgs = "RCurl")
+}
+library(RCurl)
+gameSale <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/master/statProjectDataset/Video_Games_Sales_as_at_22_Dec_2016.csv?token=AAAB08JdRZNu7MCePZkQ16kKIr-TKdeXks5a9YnFwA%3D%3D"))
+userData <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/master/statProjectDataset/steam-200k.csv?token=AAAB0wHb8A2V8CtygTP-_pbinwN5drgPks5a9YJVwA%3D%3D"))
+if (!require(package = "dplyr")) {
+  install.packages(pkgs = "dplyr")
+}
+if (!require(package = "ggplot2")) {
+  install.packages(pkgs = "ggplot2")
+}
+library(ggplot2)
+if (!require(package = "lattice")) {
+  install.packages(pkgs = "lattice")
+}
+library(lattice)
+```
+
+## Introduction
+
+Steam is one of the most popular video game platform across the world. Steam allows gamers and game producers to make transactions, provides forums and ratings for each game. As a gamer, Steam is always the number one game website I would go to when I want to explore new games. In this project I'm going to explore some gaming trend on steam in the year 2016.
+
+## Top 10 Popular games in 2016
+
+We find the 10 most popuplar games on steam till 2016. In other words, games with the most global sales. To do so, we reorder the data with descending global sales.
+
+```{r popular, echo=FALSE}
+top_n(gameSale, 10, Global_sales)
+```
+
+As we can see, the top 10 games with most sale till 2016 is listed above. One interesting feature we observed is that all of these games are published before 2010, and they are all made by Nintendo. Problably because Nintendo is known as casual games producer and we can recognize most of these above games as casual games, they are easy to play and have only simple rules. So they have all different types of players from starters to senior players.
+
+## Playing hour vs sales
+
+We are also interested in whether or not games with more sales are more fun to play, in other word, have more average playing hour. To figure out the relationship between average playing hour and sales, we used another data set about steam user's information. Notice that because many of the popular games in the previous "gameSale" data set are too old to track player's information, we only have 838 more recent games left from the 16690 games total. 
+
+```{r playing hour, echo = FALSE}
+user <- filter(userData, status == "play")
+hour <- summarize(group_by(user,game), ave_hour = mean(hour.played, na.rm = TRUE), n = n())
+Sale <- select(gameSale,sale=Global_sales,game = name,genre)
+info <- inner_join(hour,Sale, "game")
+ggplot(info, aes(sale,ave_hour, size = n)) + geom_point(alpha = 0.2)
+```
+
+As we can see, interestly, more game sales does not means longer playing hours. In fact, the average playing hour of most games that acheive more than 2 million sales does not exceed 100 hours. 
+A lot is going on with games with less than 10 million sales, to observe more , we can zoom in the graph.
+
+```{r zoom}
+ggplot(info, aes(sale,ave_hour, size = n)) + geom_point(alpha = 0.2)+ coord_cartesian(xlim = c(0,8)) + geom_smooth()
+```
+
+Although it kind of looks like that there is an inverse relationship between sale and average playing hour, after add the smooth curve, we can observe that is not the case. We have a lot of mediocre games in the bottom left corner with neither large sale nor long average playing hour. However, we can at least conclude that, relatively, games with longer average playing hour do not have a very high sale, and super popular games with a high sale does not have a long playing hour. 
+
+We guess that this might be related to the game type. Some games requires longer time to understand and get used to the rules, so they are less popular but have longer playing time. Causual games however, are really easy to start, so more people might enjoy playing it. But they are more simple, and probably not much to play with.
+
+## Game type
+
+To test our hypothesis, we graph the relationship between average playing hour and average sale of different game types to see is there a trend. 
+
+```{r game type}
+type <- summarize(group_by(info,genre), ave_hour = mean(ave_hour, na.rm = TRUE), n = n())
+ggplot(type) + geom_point(aes(x=ave_hour, y = reorder(genre,ave_hour),size =n))
+```
+
+As we expected, different types of game do have different average playing hour, and it makes sense with hour hypothesis. For example, from common senses, sports, simulation and role-playing games are usually more complex and require longer time to play the game well. WHile adventure, puzzle and platform games are usually the ones we consider as casual games, which are simpler but easier to get bored with.
+
