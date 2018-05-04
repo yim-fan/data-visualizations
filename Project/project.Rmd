@@ -74,3 +74,13 @@ ggplot(type) + geom_point(aes(x=ave_hour, y = reorder(genre,ave_hour),size =n))
 
 As we expected, different types of game do have different average playing hour, and it makes sense with hour hypothesis. For example, from common senses, sports, simulation and role-playing games are usually more complex and require longer time to play the game well. WHile adventure, puzzle and platform games are usually the ones we consider as casual games, which are simpler but easier to get bored with.
 
+## Gaming industry blooming?
+
+We are also curious about how well the gaming industry is doing from 1980 to 2016. So we make a graph about the total sale and number of games published each year.
+
+```{r year}
+years <- summarize(group_by(gameSale,year), sum_sale = sum(Global_sales, na.rm = TRUE), n =n())
+ggplot(years, aes(year,n, size = sum_sale)) +geom_point()
+```
+
+From the graph we can observe that gaming industry starts to bloom from 1994, and reach the peak at 2008 and 2009. The total game sales and number of games published on steam increases greatly during this period. However the growth stops after 2009, and both the data start to decreases. As the leader in the industry, steam is not doing as well as before unfortunately.
