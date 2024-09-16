@@ -11,7 +11,7 @@ if (!require(package = "RCurl")) {
   install.packages(pkgs = "RCurl")
 }
 library(RCurl)
-gameSale <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/master/statProjectDataset/Video_Games_Sales_as_at_22_Dec_2016.csv?token=AAAB0772gyPezUIcNxieE_Kegqq4exSPks5avqiywA%3D%3D"))
+gameSale <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/e00aeac187761ba4842bd4aaa8dd21e1a2d44c21/statProjectDataset/Video_Games_Sales_as_at_22_Dec_2016.csv?token=AAAB06ix60gxzVYNcBb1mmNhXy-lE-r8ks5a9Yc-wA%3D%3D"))
 userData <-read.csv(text=getURL("https://github.uiowa.edu/raw/yimfan/project-dataset/master/statProjectDataset/steam-200k.csv?token=AAAB07ZEQ1JDoIkB-spGLHm2jbRRR9Mmks5avqY1wA%3D%3D"))
 ```
 

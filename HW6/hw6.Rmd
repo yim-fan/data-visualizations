@@ -54,8 +54,8 @@ head(wtfl,2)
 We can now play with the dataset and generate useful graph from it. Below is a average departure delay vs. wind speed graph.
 
 ```{r wtfl plot, message=FALSE, warning=FALSE, paged.print=TRUE}
-wtfl1 <- summarize(group_by(wtfl, wind_speed_level = equal.count(wind_speed)), ave_dep_delay = mean(dep_delay, na.rm = TRUE),n = n())
-ggplot(wtfl1, aes(wind_speed_level,ave_dep_delay)) + geom_point() + geom_smooth()
+wtfl2 <- summarize(group_by(wtfl, wind_speed_level = equal.count(wind_speed)), ave_dep_delay = mean(dep_delay, na.rm = TRUE),n = n())
+ggplot(wtfl2, aes(wind_speed_level,ave_dep_delay)) + geom_point() + geom_smooth()
 ```
 
 As we can see from the graph, flight average departure delay is associated with the wind speed level at that time. Generally flights that depart at lower wind speed level tend to be delayed less. 
@@ -63,7 +63,7 @@ As we can see from the graph, flight average departure delay is associated with 
 However, the trend becomes messier at higher wind speed level. The departure delay seems faily random when the wind speed get large because we have less observations of departures at these higher wind speed days. To show this problem, we embed numbers of departures into the graph by the size of the points.
 
 ```{r wtfl plot embed departure num, message=FALSE, warning=FALSE, paged.print=FALSE}
-ggplot(wtfl1, aes(wind_speed_level,ave_dep_delay, size = n)) + geom_point(alpha = 0.8) + geom_smooth()
+ggplot(wtfl2, aes(wind_speed_level,ave_dep_delay, size = n)) + geom_point(alpha = 0.8) + geom_smooth()
 ```
 
 This graph shows us that the number of departures decreases greately after wind speed of 25mph. This decrease is either caused by large amount of canceled flights or rarely severe weather. But overall days with higher wind speed are not good days to take flights.
